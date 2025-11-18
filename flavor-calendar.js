@@ -1,5 +1,14 @@
 const targetYear = 2026;
 
+const flavorRotation2025 = [
+"Heath Bar®",
+"Blueberry Pie",
+"Nutter Butter®",
+"Coffee Toffee",
+"Mint Oreo®",
+"Strawberry Cheesecake"
+];
+
 const flavorRotation2026 = [
 "Reese's® Cheesecake",
 "Coffee Toffee",
@@ -56,6 +65,8 @@ const flavorRotation2026 = [
 "Nutter Butter®"
 ];
 
+const fullRotation = [...flavorRotation2025, ...flavorRotation2026];
+
 const imageBaseURL = "https://spm725.github.io/2026-Calendar/Images/";
 
 function getImageURL(name) {
@@ -63,66 +74,54 @@ function getImageURL(name) {
         .toLowerCase()
         .replace(/ /g, "-")
         .replace(/®/g, "")
-        .replace(/'/g, "") +
-        ".jpg";
+        .replace(/'/g, "") + ".jpg";
 }
 
-function getFirstMondayEndingInYear(year) {
-    let d = new Date(year - 1, 11, 25);
-    while (true) {
-        d.setDate(d.getDate() + 1);
-        const monday = new Date(d);
-        if (monday.getDay() === 1) {
-            const sunday = new Date(monday);
-            sunday.setDate(sunday.getDate() + 6);
-            if (sunday.getFullYear() === year) return monday;
-        }
-    }
+function getStartDate() {
+    return new Date(2025, 10, 17);
 }
 
 function formatDate(d) {
     return d.toISOString().slice(0, 10);
 }
 
-function buildFlavorData(year, rotation) {
-    const firstMonday = getFirstMondayEndingInYear(year);
+function buildFlavorData(rotation) {
+    const start = getStartDate();
     return rotation.map((text, i) => {
-        const start = new Date(firstMonday);
-        start.setDate(start.getDate() + i * 7);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
+        const s = new Date(start);
+        s.setDate(s.getDate() + i * 7);
+        const e = new Date(s);
+        e.setDate(e.getDate() + 6);
         return {
             text,
-            start: formatDate(start),
-            end: formatDate(end),
+            start: formatDate(s),
+            end: formatDate(e),
             image: getImageURL(text)
         };
     });
 }
 
-const flavorData = buildFlavorData(targetYear, flavorRotation2026);
+const flavorData = buildFlavorData(fullRotation);
 
-window.addEventListener('DOMContentLoaded', function () {
-    const calendarContainer = document.getElementById('calendar-container');
-    const monthDisplay = document.getElementById('month-display');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
-    const currentFlavorBox = document.getElementById('featured-flavor');
-
-    if (!(calendarContainer && monthDisplay && prevButton && nextButton && currentFlavorBox)) return;
+window.addEventListener("DOMContentLoaded", function () {
+    const calendarContainer = document.getElementById("calendar-container");
+    const monthDisplay = document.getElementById("month-display");
+    const prevButton = document.getElementById("prev-button");
+    const nextButton = document.getElementById("next-button");
+    const currentFlavorBox = document.getElementById("featured-flavor");
 
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
     function normalizeDate(str) {
-        const [y, m, d] = str.split('-').map(Number);
+        const [y, m, d] = str.split("-").map(Number);
         return new Date(y, m - 1, d);
     }
 
     function updateCurrentFlavor() {
         const today = new Date();
         const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const f = flavorData.find(fl => {
+        const f = flavorData.find((fl) => {
             const s = normalizeDate(fl.start);
             const e = normalizeDate(fl.end);
             return t >= s && t <= e;
@@ -141,9 +140,10 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
     function checkPrevButton() {
-        const firstStart = normalizeDate(flavorData[0].start);
+        const today = new Date();
+        const currentStart = new Date(today.getFullYear(), today.getMonth(), 1);
         const displayed = new Date(currentYear, currentMonth, 1);
-        prevButton.disabled = displayed <= firstStart;
+        prevButton.disabled = displayed <= currentStart;
     }
 
     function checkNextButton() {
@@ -153,73 +153,79 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
     function adjustFontSizeForFlavorText() {
-        document.querySelectorAll('.flavor-text').forEach(t => {
+        document.querySelectorAll(".flavor-text").forEach((t) => {
             let size = 10;
-            t.style.fontSize = size + 'px';
-            while ((t.scrollWidth > t.parentElement.clientWidth ||
-                   t.scrollHeight > t.parentElement.clientHeight) &&
-                   size > 6) {
+            t.style.fontSize = size + "px";
+            while (
+                (t.scrollWidth > t.parentElement.clientWidth ||
+                    t.scrollHeight > t.parentElement.clientHeight) &&
+                size > 6
+            ) {
                 size -= 0.5;
-                t.style.fontSize = size + 'px';
+                t.style.fontSize = size + "px";
             }
         });
     }
 
     function adjustCalendarColumns() {
         if (window.innerWidth > 1200) {
-            calendarContainer.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            calendarContainer.style.gridTemplateColumns = "repeat(7, 1fr)";
         } else if (window.innerWidth > 768) {
-            calendarContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            calendarContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
         } else {
-            calendarContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            calendarContainer.style.gridTemplateColumns = "repeat(4, 1fr)";
         }
     }
 
     function renderCalendar(year, month) {
-        calendarContainer.innerHTML = '';
+        calendarContainer.innerHTML = "";
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const first = new Date(year, month, 1);
-        const last = new Date(year, month + 1, 0);
+        let first = new Date(year, month, 1);
+        while (first.getDay() !== 1) first.setDate(first.getDate() - 1);
+
+        let last = new Date(year, month + 1, 0);
+        while (last.getDay() !== 0) last.setDate(last.getDate() + 1);
 
         const months = [
-            'January','February','March','April','May','June',
-            'July','August','September','October','November','December'
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
         ];
         monthDisplay.textContent = `${months[month]} ${year}`;
 
         for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
-            const cell = document.createElement('div');
-            cell.className = 'calendar-cell';
+            const cell = document.createElement("div");
+            cell.className = "calendar-cell";
 
-            const num = document.createElement('div');
-            num.className = 'day-number';
+            const num = document.createElement("div");
+            num.className = "day-number";
             num.textContent = d.getDate();
             cell.appendChild(num);
 
-            const lbl = document.createElement('div');
-            lbl.className = 'day-of-week';
-            lbl.textContent = d.toLocaleString('en-US', { weekday: 'short' });
+            const lbl = document.createElement("div");
+            lbl.className = "day-of-week";
+            lbl.textContent = d.toLocaleString("en-US", { weekday: "short" });
             cell.appendChild(lbl);
 
             const todayStamp = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-            if (d.getTime() === todayStamp) cell.classList.add('current-date');
+            if (d.getTime() === todayStamp) cell.classList.add("current-date");
 
-            const fl = flavorData.find(fl => {
+            const fl = flavorData.find((fl) => {
                 const s = normalizeDate(fl.start);
                 const e = normalizeDate(fl.end);
                 return d >= s && d <= e;
             });
 
             if (fl) {
-                const ft = document.createElement('div');
-                ft.className = 'flavor-text';
+                const ft = document.createElement("div");
+                ft.className = "flavor-text";
                 ft.textContent = fl.text;
                 cell.appendChild(ft);
+
                 if (d < today) {
-                    cell.classList.add('past-day');
-                    ft.classList.add('strikethrough');
+                    cell.classList.add("past-day");
+                    ft.classList.add("strikethrough");
                 }
             }
 
@@ -232,8 +238,13 @@ window.addEventListener('DOMContentLoaded', function () {
         adjustCalendarColumns();
     }
 
-    prevButton.addEventListener('click', e => {
+    prevButton.addEventListener("click", (e) => {
         e.preventDefault();
+        const today = new Date();
+        const currentStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const displayed = new Date(currentYear, currentMonth, 1);
+        if (displayed <= currentStart) return;
+
         currentMonth--;
         if (currentMonth < 0) {
             currentMonth = 11;
@@ -242,7 +253,7 @@ window.addEventListener('DOMContentLoaded', function () {
         renderCalendar(currentYear, currentMonth);
     });
 
-    nextButton.addEventListener('click', e => {
+    nextButton.addEventListener("click", (e) => {
         e.preventDefault();
         currentMonth++;
         if (currentMonth > 11) {
@@ -255,8 +266,8 @@ window.addEventListener('DOMContentLoaded', function () {
     updateCurrentFlavor();
     renderCalendar(currentYear, currentMonth);
 
-    window.addEventListener('load', adjustFontSizeForFlavorText);
-    window.addEventListener('resize', () => {
+    window.addEventListener("load", adjustFontSizeForFlavorText);
+    window.addEventListener("resize", () => {
         adjustFontSizeForFlavorText();
         adjustCalendarColumns();
     });
