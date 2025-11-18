@@ -1,68 +1,68 @@
 const targetYear = 2026;
 
 const flavorRotation2025 = [
-"Heath Bar®",
-"Blueberry Pie",
-"Nutter Butter®",
-"Coffee Toffee",
-"Mint Oreo®",
-"Strawberry Cheesecake"
+    "Heath Bar®",
+    "Blueberry Pie",
+    "Nutter Butter®",
+    "Coffee Toffee",
+    "Mint Oreo®",
+    "Strawberry Cheesecake"
 ];
 
 const flavorRotation2026 = [
-"Reese's® Cheesecake",
-"Coffee Toffee",
-"Butterfinger®",
-"Toasted Coconut",
-"Peaches n' Cream",
-"Nutter Butter®",
-"Strawberry Swirl",
-"Cookies n' Cream",
-"Blueberry Pie",
-"Reese's Peanut Butter Cup®",
-"Black Raspberry",
-"Mint Oreo®",
-"Toasted Coconut",
-"Orange Dreamsicle",
-"Strawberry Cheesecake",
-"Butterfinger®",
-"Peaches n' Cream",
-"Reese's Peanut Butter Cup®",
-"Oreo® Cheesecake",
-"Blueberry Pie",
-"Nutter Butter®",
-"Mint Oreo®",
-"Key Lime Pie",
-"Toasted Coconut",
-"Black Raspberry",
-"Coffee Toffee",
-"Strawberry Cheesecake",
-"Reese's Peanut Butter Cup®",
-"Orange Dreamsicle",
-"Key Lime Pie",
-"Reese's® Cheesecake",
-"Cookies n' Cream",
-"Toasted Coconut",
-"Blueberry Pie",
-"Strawberry Cheesecake",
-"Mint Oreo®",
-"Black Raspberry",
-"Nutter Butter®",
-"Strawberry Swirl",
-"Heath Bar®",
-"Reese's Peanut Butter Cup®",
-"Mint Oreo®",
-"Butterfinger®",
-"Oreo® Cheesecake",
-"Toasted Coconut",
-"Strawberry Swirl",
-"Heath Bar®",
-"Blueberry Pie",
-"Reese's® Cheesecake",
-"Coffee Toffee",
-"Mint Oreo®",
-"Strawberry Cheesecake",
-"Nutter Butter®"
+    "Reese's® Cheesecake",
+    "Coffee Toffee",
+    "Butterfinger®",
+    "Toasted Coconut",
+    "Peaches n' Cream",
+    "Nutter Butter®",
+    "Strawberry Swirl",
+    "Cookies n' Cream",
+    "Blueberry Pie",
+    "Reese's Peanut Butter Cup®",
+    "Black Raspberry",
+    "Mint Oreo®",
+    "Toasted Coconut",
+    "Orange Dreamsicle",
+    "Strawberry Cheesecake",
+    "Butterfinger®",
+    "Peaches n' Cream",
+    "Reese's Peanut Butter Cup®",
+    "Oreo® Cheesecake",
+    "Blueberry Pie",
+    "Nutter Butter®",
+    "Mint Oreo®",
+    "Key Lime Pie",
+    "Toasted Coconut",
+    "Black Raspberry",
+    "Coffee Toffee",
+    "Strawberry Cheesecake",
+    "Reese's Peanut Butter Cup®",
+    "Orange Dreamsicle",
+    "Key Lime Pie",
+    "Reese's® Cheesecake",
+    "Cookies n' Cream",
+    "Toasted Coconut",
+    "Blueberry Pie",
+    "Strawberry Cheesecake",
+    "Mint Oreo®",
+    "Black Raspberry",
+    "Nutter Butter®",
+    "Strawberry Swirl",
+    "Heath Bar®",
+    "Reese's Peanut Butter Cup®",
+    "Mint Oreo®",
+    "Butterfinger®",
+    "Oreo® Cheesecake",
+    "Toasted Coconut",
+    "Strawberry Swirl",
+    "Heath Bar®",
+    "Blueberry Pie",
+    "Reese's® Cheesecake",
+    "Coffee Toffee",
+    "Mint Oreo®",
+    "Strawberry Cheesecake",
+    "Nutter Butter®"
 ];
 
 const fullRotation = [...flavorRotation2025, ...flavorRotation2026];
@@ -70,14 +70,19 @@ const fullRotation = [...flavorRotation2025, ...flavorRotation2026];
 const imageBaseURL = "https://spm725.github.io/2026-Calendar/Images/";
 
 function getImageURL(name) {
-    return imageBaseURL + name
-        .toLowerCase()
-        .replace(/ /g, "-")
-        .replace(/®/g, "")
-        .replace(/'/g, "") + ".jpg";
+    return (
+        imageBaseURL +
+        name
+            .toLowerCase()
+            .replace(/ /g, "-")
+            .replace(/®/g, "")
+            .replace(/'/g, "") +
+        ".jpg"
+    );
 }
 
 function getStartDate() {
+    // Calendar schedule starts Monday, Nov 17, 2025
     return new Date(2025, 10, 17);
 }
 
@@ -96,7 +101,7 @@ function buildFlavorData(rotation) {
             text,
             start: formatDate(s),
             end: formatDate(e),
-            image: getImageURL(text)
+            image: getImageURL(text),
         };
     });
 }
@@ -120,7 +125,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function updateCurrentFlavor() {
         const today = new Date();
-        const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const t = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+        );
         const f = flavorData.find((fl) => {
             const s = normalizeDate(fl.start);
             const e = normalizeDate(fl.end);
@@ -141,13 +150,19 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function checkPrevButton() {
         const today = new Date();
-        const currentStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const currentStart = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+        );
         const displayed = new Date(currentYear, currentMonth, 1);
         prevButton.disabled = displayed <= currentStart;
     }
 
     function checkNextButton() {
-        const lastEnd = normalizeDate(flavorData[flavorData.length - 1].end);
+        const lastEnd = normalizeDate(
+            flavorData[flavorData.length - 1].end
+        );
         const displayed = new Date(currentYear, currentMonth + 1, 0);
         nextButton.disabled = displayed >= lastEnd;
     }
@@ -189,12 +204,26 @@ window.addEventListener("DOMContentLoaded", function () {
         while (last.getDay() !== 0) last.setDate(last.getDate() + 1);
 
         const months = [
-            "January","February","March","April","May","June",
-            "July","August","September","October","November","December"
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
         ];
         monthDisplay.textContent = `${months[month]} ${year}`;
 
-        for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+        for (
+            let d = new Date(first);
+            d <= last;
+            d.setDate(d.getDate() + 1)
+        ) {
             const cell = document.createElement("div");
             cell.className = "calendar-cell";
 
@@ -212,7 +241,11 @@ window.addEventListener("DOMContentLoaded", function () {
             lbl.textContent = d.toLocaleString("en-US", { weekday: "short" });
             cell.appendChild(lbl);
 
-            const todayStamp = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+            const todayStamp = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate()
+            ).getTime();
             if (d.getTime() === todayStamp) cell.classList.add("current-date");
 
             const fl = flavorData.find((fl) => {
@@ -228,9 +261,13 @@ window.addEventListener("DOMContentLoaded", function () {
                 cell.appendChild(ft);
 
                 if (d < today) {
-                    cell.classList.add("past-day");
                     ft.classList.add("strikethrough");
                 }
+            }
+
+            // NEW: mark ALL past days, even without a flavor
+            if (d < today) {
+                cell.classList.add("past-day");
             }
 
             calendarContainer.appendChild(cell);
@@ -245,7 +282,11 @@ window.addEventListener("DOMContentLoaded", function () {
     prevButton.addEventListener("click", (e) => {
         e.preventDefault();
         const today = new Date();
-        const currentStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const currentStart = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+        );
         const displayed = new Date(currentYear, currentMonth, 1);
         if (displayed <= currentStart) return;
 
