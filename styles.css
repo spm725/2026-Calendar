@@ -257,3 +257,15 @@ button:disabled {
         flex-grow: 0;
     }
 }
+.other-month {
+    background-color: #f3f3f3 !important;
+    color: #999 !important;
+    opacity: 0.7;
+}
+
+.other-month .day-number,
+.other-month .day-of-week,
+.other-month .flavor-text {
+    color: #999 !important;
+}
+
