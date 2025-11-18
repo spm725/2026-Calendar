@@ -1,6 +1,12 @@
 const targetYear = 2026;
 
-const flavorRotation2026 = [
+const flavorRotation = [
+"Heath Bar®",
+"Blueberry Pie",
+"Nutter Butter®",
+"Coffee Toffee",
+"Mint Oreo®",
+"Strawberry Cheesecake",
 "Reese's® Cheesecake",
 "Coffee Toffee",
 "Butterfinger®",
@@ -67,40 +73,31 @@ function getImageURL(name) {
         ".jpg";
 }
 
-function getFirstMondayEndingInYear(year) {
-    let d = new Date(year - 1, 11, 25);
-    while (true) {
-        d.setDate(d.getDate() + 1);
-        const monday = new Date(d);
-        if (monday.getDay() === 1) {
-            const sunday = new Date(monday);
-            sunday.setDate(sunday.getDate() + 6);
-            if (sunday.getFullYear() === year) return monday;
-        }
-    }
+function getStartDate() {
+    return new Date(2025, 10, 17);
 }
 
 function formatDate(d) {
     return d.toISOString().slice(0, 10);
 }
 
-function buildFlavorData(year, rotation) {
-    const firstMonday = getFirstMondayEndingInYear(year);
+function buildFlavorData(rotation) {
+    const start = getStartDate();
     return rotation.map((text, i) => {
-        const start = new Date(firstMonday);
-        start.setDate(start.getDate() + i * 7);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
+        const s = new Date(start);
+        s.setDate(s.getDate() + i * 7);
+        const e = new Date(s);
+        e.setDate(e.getDate() + 6);
         return {
             text,
-            start: formatDate(start),
-            end: formatDate(end),
+            start: formatDate(s),
+            end: formatDate(e),
             image: getImageURL(text)
         };
     });
 }
 
-const flavorData = buildFlavorData(targetYear, flavorRotation2026);
+const flavorData = buildFlavorData(flavorRotation);
 
 window.addEventListener('DOMContentLoaded', function () {
     const calendarContainer = document.getElementById('calendar-container');
@@ -111,8 +108,9 @@ window.addEventListener('DOMContentLoaded', function () {
 
     if (!(calendarContainer && monthDisplay && prevButton && nextButton && currentFlavorBox)) return;
 
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
 
     function normalizeDate(str) {
         const [y, m, d] = str.split('-').map(Number);
@@ -120,12 +118,11 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateCurrentFlavor() {
-        const today = new Date();
-        const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const f = flavorData.find(fl => {
             const s = normalizeDate(fl.start);
             const e = normalizeDate(fl.end);
-            return t >= s && t <= e;
+            return now >= s && now <= e;
         });
         if (f) {
             currentFlavorBox.innerHTML = `
@@ -141,9 +138,9 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
     function checkPrevButton() {
-        const firstStart = normalizeDate(flavorData[0].start);
         const displayed = new Date(currentYear, currentMonth, 1);
-        prevButton.disabled = displayed <= firstStart;
+        const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        prevButton.disabled = displayed <= thisMonth;
     }
 
     function checkNextButton() {
@@ -177,9 +174,6 @@ window.addEventListener('DOMContentLoaded', function () {
 
     function renderCalendar(year, month) {
         calendarContainer.innerHTML = '';
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
         const first = new Date(year, month, 1);
         const last = new Date(year, month + 1, 0);
 
@@ -217,6 +211,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 ft.className = 'flavor-text';
                 ft.textContent = fl.text;
                 cell.appendChild(ft);
+
                 if (d < today) {
                     cell.classList.add('past-day');
                     ft.classList.add('strikethrough');
@@ -234,6 +229,10 @@ window.addEventListener('DOMContentLoaded', function () {
 
     prevButton.addEventListener('click', e => {
         e.preventDefault();
+        const displayed = new Date(currentYear, currentMonth, 1);
+        const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        if (displayed <= thisMonth) return;
+
         currentMonth--;
         if (currentMonth < 0) {
             currentMonth = 11;
