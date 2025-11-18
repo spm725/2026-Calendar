@@ -13,9 +13,9 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: auto;              /* Let content define height */
-    overflow-x: hidden;        /* Prevent horizontal overflow */
-    overflow-y: visible;       /* No inner scrolling, let parent/page scroll */
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: visible;
 }
 
 body {
@@ -38,19 +38,19 @@ body {
     overflow: visible;
     display: flex;
     flex-direction: column;
-    margin-bottom: 50px; /* Adjusted bottom margin */
+    margin-bottom: 50px;
 }
 
 /* Title */
 h1 {
     font-family: 'GothamSSm-Black', sans-serif;
-    font-size: 2.5rem; /* Adjusted size for better mobile readability */
+    font-size: 2.5rem;
     color: #000000;
     margin-bottom: 20px;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Featured Flavor Box Centered */
+/* Featured Flavor */
 .featured-flavor {
     width: 100%;
     max-width: 350px;
@@ -59,7 +59,6 @@ h1 {
     padding: 8px;
 }
 
-/* Current Flavor Title */
 .featured-flavor .title {
     font-size: 1.3rem;
     font-weight: bold;
@@ -67,7 +66,6 @@ h1 {
     margin-bottom: 8px;
 }
 
-/* Current Flavor Box to Display Image */
 .featured-flavor .flavor-name {
     font-size: 0;
     padding: 0;
@@ -87,7 +85,7 @@ h1 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    gap: 15px; /* Adjusted gap */
+    gap: 15px;
 }
 
 .calendar-navigation button {
@@ -113,7 +111,6 @@ button:disabled {
 #month-display {
     font-size: 20px;
     font-weight: bold;
-    margin: 0 10px; /* Adjusted spacing */
     color: #444;
     text-align: center;
 }
@@ -121,7 +118,7 @@ button:disabled {
 /* Calendar Grid */
 #calendar-container {
     display: grid;
-    grid-template-columns: repeat(7, 1fr) !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
     gap: 5px;
     width: 100%;
     padding: 10px;
@@ -137,15 +134,16 @@ button:disabled {
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     transition: background-color 0.3s ease, transform 0.2s ease;
     aspect-ratio: 1 / 1;
     position: relative;
+    min-width: 0; /* <-- critical fix: prevents overflow */
 }
 
-/* Day Number Top Right */
+/* Day Number */
 .day-number {
     position: absolute;
     top: 5px;
@@ -155,7 +153,7 @@ button:disabled {
     color: #555;
 }
 
-/* Day of the Week Top Left */
+/* Day of Week */
 .day-of-week {
     position: absolute;
     top: 5px;
@@ -165,7 +163,7 @@ button:disabled {
     color: #888;
 }
 
-/* Flavor Text Centered */
+/* Flavor Text */
 .flavor-text {
     color: #333;
     font-weight: bold;
@@ -175,16 +173,14 @@ button:disabled {
     margin: auto;
 }
 
-/* Highlight for Current Date */
+/* Current Date */
 .current-date {
     border: 2px solid #fdd835;
     background: transparent;
     border-radius: 8px;
-    font-weight: bold;
-    color: #333;
 }
 
-/* Days from OTHER months (grid spillover) */
+/* Other Month */
 .other-month {
     background-color: #f3f3f3 !important;
     color: #999 !important;
@@ -197,12 +193,12 @@ button:disabled {
     color: #999 !important;
 }
 
-/* ALL PAST DAYS (before today) */
+/* Past Days */
 .calendar-cell.past-day {
     background-color: #e0e0e0 !important;
     color: #777 !important;
     opacity: 0.7 !important;
-    pointer-events: none; /* prevent clicks on past days */
+    pointer-events: none;
 }
 
 .calendar-cell.past-day .day-number,
@@ -211,69 +207,45 @@ button:disabled {
     color: #777 !important;
 }
 
-/* Strikethrough only for past flavor text */
 .calendar-cell.past-day .flavor-text {
     text-decoration: line-through;
 }
 
-/* Mobile Responsiveness */
+/* --------- RESPONSIVE --------- */
+
+/* Tablets */
 @media (max-width: 992px) {
     #calendar-container {
-        grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         gap: 5px;
         padding: 5px;
-    }
-
-    .calendar-navigation {
-        gap: 5px;
     }
 
     h1 {
         font-size: 1.8rem;
     }
 
-    .calendar-navigation button {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-
-    #month-display {
-        margin: 0 5px;
-    }
-
     .featured-flavor {
         max-width: 300px;
-        font-size: 1rem;
-    }
-
-    .bottom-padding {
-        height: 0; /* Removed extra padding */
-    }
-
-    .spacer {
-        flex-grow: 0;
     }
 }
 
+/* Phones */
 @media (max-width: 576px) {
     #calendar-container {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 5px;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 4px;
     }
 
     .calendar-navigation {
-        gap: 3px;
+        gap: 4px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
     }
 
     .featured-flavor {
         max-width: 90%;
-    }
-
-    .bottom-padding {
-        height: 0; /* Removed extra padding */
-    }
-
-    .spacer {
-        flex-grow: 0;
     }
 }
