@@ -4,68 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custard Calendar</title>
+
+    <!-- External Styles -->
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    
-    <style>
-        /* General Layout Adjustments */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            overflow: auto; /* Allow scrolling for smaller devices */
-        }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-
-        /* Extra padding at the bottom of the page */
-        .bottom-padding {
-            height: 50px; /* Adjust the height as necessary for more or less space */
-        }
-    </style>
+    <!-- NOTE:
+         We removed the extra html/body/container overrides that forced 100% height
+         and inner scrolling. styles.css now controls layout. -->
 </head>
 <body>
     <div class="container">
         <h1>Custard Calendar</h1>
         <div id="featured-flavor" class="featured-flavor"></div>
+
         <div class="calendar-navigation">
-            <!-- Updated button types to prevent unintended form behavior -->
             <button id="prev-button" type="button">Previous</button>
             <div id="month-display"></div>
             <button id="next-button" type="button">Next</button>
         </div>
+
         <div id="calendar-container"></div>
-        <div class="bottom-padding"></div> <!-- Added space at the bottom -->
+
+        <!-- Padding at the bottom (class is defined in styles.css) -->
+        <div class="bottom-padding"></div>
     </div>
 
-    <!-- Move the script to the end of the body -->
+    <!-- Calendar logic -->
     <script src="flavor-calendar.js"></script>
 
-    <!-- Send height to parent when content is loaded -->
+    <!-- Auto-height + responsive labels -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            window.addEventListener('load', function() {
-                const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        (function () {
+            // --------- 1. Send height to parent ----------
+            function sendIframeHeight() {
+                // Use the tallest of body / documentElement
+                var height = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+
                 window.parent.postMessage({
-                    type: 'setIframeHeight',
+                    type: 'setIframeHeight',  // Parent will listen for this
                     height: height
                 }, '*');
+            }
+
+            // On full load
+            window.addEventListener('load', function () {
+                sendIframeHeight();
+                // Send again after a delay in case fonts/images load later
+                setTimeout(sendIframeHeight, 500);
             });
 
+            // On resize (rotation, viewport changes)
+            window.addEventListener('resize', sendIframeHeight);
+
+            // Observe DOM changes (e.g., when month changes)
+            var observer = new MutationObserver(function () {
+                sendIframeHeight();
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true
+            });
+
+            // --------- 2. Button label responsiveness ----------
             function adjustButtonLabels() {
-                const prevButton = document.getElementById('prev-button');
-                const nextButton = document.getElementById('next-button');
+                var prevButton = document.getElementById('prev-button');
+                var nextButton = document.getElementById('next-button');
+
+                if (!prevButton || !nextButton) return;
 
                 if (window.innerWidth < 768) {
                     prevButton.textContent = 'Prev';
@@ -77,17 +88,16 @@
             }
 
             window.addEventListener('resize', adjustButtonLabels);
-            adjustButtonLabels();
 
-            // Event listeners for buttons, updated to ensure no scrolling occurs
-            document.getElementById('prev-button').addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent default action to stop any kind of scrolling
+            document.addEventListener('DOMContentLoaded', function () {
+                adjustButtonLabels();
             });
 
-            document.getElementById('next-button').addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent default action to stop any kind of scrolling
-            });
-        });
+            // NOTE:
+            // We removed event.preventDefault() on the buttons.
+            // These are simple <button type="button"> elements,
+            // so they don't cause navigation/scrolling by default.
+        })();
     </script>
 </body>
 </html>
