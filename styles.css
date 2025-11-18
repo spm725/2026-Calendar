@@ -268,4 +268,16 @@ button:disabled {
 .other-month .flavor-text {
     color: #999 !important;
 }
+.past-day {
+    background-color: #e9e9e9 !important;
+    color: #999 !important;
+    opacity: 0.6;
+}
+
+.past-day .day-number,
+.past-day .day-of-week,
+.past-day .flavor-text {
+    color: #999 !important;
+}
+
 
