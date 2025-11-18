@@ -198,6 +198,10 @@ window.addEventListener("DOMContentLoaded", function () {
             const cell = document.createElement("div");
             cell.className = "calendar-cell";
 
+            if (d.getMonth() !== month) {
+                cell.classList.add("other-month");
+            }
+
             const num = document.createElement("div");
             num.className = "day-number";
             num.textContent = d.getDate();
